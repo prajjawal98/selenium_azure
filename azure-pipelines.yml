@@ -1,0 +1,36 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+  - main  # Adjust the branch name as per your repository
+
+pool:
+  vmImage: 'ubuntu-latest'  # Use 'windows-latest' if you prefer a Windows agent
+
+steps:
+# 1. Install Java
+- task: JavaToolInstaller@0
+  inputs:
+    versionSpec: '11'  # Use the version of Java you require
+    jdkArchitectureOption: 'x64'
+
+# 2. Install Maven (if you use Maven for Cucumber Selenium tests)
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'  # Path to your Maven POM file
+    goals: 'clean install'   # Adjust goals according to your Maven setup
+
+# 3. Run Cucumber Selenium Tests
+- script: |
+    mvn test  # Or other command to run the Selenium Cucumber tests
+  displayName: 'Run Cucumber Selenium Tests'
+
+# 4. Publish Test Results (JUnit format)
+- task: PublishTestResults@2
+  inputs:
+    testResultsFiles: '**/target/cucumber-report'  # Path to your Cucumber report files in JUnit format
+    testRunTitle: 'Cucumber Test Results'
+    mergeTestResults: true
+
