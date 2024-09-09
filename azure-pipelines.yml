@@ -6,8 +6,7 @@
 trigger:
   - main  # Adjust the branch name as per your repository
 
-pool:
-  vmImage: 'ubuntu-latest'  # Use 'windows-latest' if you prefer a Windows agent
+pool: default # Use 'windows-latest' if you prefer a Windows agent
 
 steps:
 # 1. Install Java
