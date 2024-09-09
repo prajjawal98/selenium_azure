@@ -4,22 +4,28 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
-  - main  # Adjust the branch name as per your repository
+  branches:
+    include:
+      - main  # Adjust the branch name as per your repository
 
-pool: default # Use 'windows-latest' if you prefer a Windows agent
+pool: default  # Use 'windows-latest' if you prefer a Windows agent
 
 steps:
 # 1. Install Java
 - task: JavaToolInstaller@0
   inputs:
-    versionSpec: '11'  # Use the version of Java you require
+    versionSpec: '1.11'  # Use the version of Java you require
+    jdkSourceOption: 'Package'
+    jdkPackageType: 'jdk'
     jdkArchitectureOption: 'x64'
+  displayName: 'Install JDK 11'
 
 # 2. Install Maven (if you use Maven for Cucumber Selenium tests)
 - task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'  # Path to your Maven POM file
     goals: 'clean install'   # Adjust goals according to your Maven setup
+  displayName: 'Install Maven and Build'
 
 # 3. Run Cucumber Selenium Tests
 - script: |
@@ -29,7 +35,7 @@ steps:
 # 4. Publish Test Results (JUnit format)
 - task: PublishTestResults@2
   inputs:
-    testResultsFiles: '**/target/cucumber-report'  # Path to your Cucumber report files in JUnit format
+    testResultsFiles: '**/target/surefire-reports/TEST-*.xml'  # Path to your Cucumber test results in JUnit format
     testRunTitle: 'Cucumber Test Results'
     mergeTestResults: true
-
+  displayName: 'Publish Test Results'
